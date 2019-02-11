@@ -1,6 +1,7 @@
 'use strict';
 
-import { app, protocol, BrowserWindow } from 'electron';
+import { app, protocol, BrowserWindow, session } from 'electron';
+import { log } from 'electron-log';
 import {
   createProtocol,
   installVueDevtools,
@@ -17,14 +18,16 @@ function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({ width: 800, height: 600 });
 
+  win.loadURL('http://radiko.jp/#!/timeshift');
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
+    // win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
     if (!process.env.IS_TEST) { win.webContents.openDevTools(); }
   } else {
     createProtocol('app');
     // Load the index.html when not in development
-    win.loadURL('app://./index.html');
+    // win.loadURL('app://./index.html');
   }
 
   win.on('closed', () => {
@@ -57,6 +60,15 @@ app.on('ready', async () => {
     // Install Vue Devtools
     await installVueDevtools();
   }
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    if (details.url.match(/playlist.m3u8/) && details.headers['X-Radiko-AuthToken']) {
+      // console.log(details);
+      console.log('url: ', details.url)
+      console.log('X-Radiko-AuthToken: ', details.headers['X-Radiko-AuthToken']);
+    }
+    callback({});
+  });
+
   createWindow();
 });
 
