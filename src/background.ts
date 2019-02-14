@@ -6,6 +6,11 @@ import {
   createProtocol,
   installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib';
+const ffmpegStatic = require('ffmpeg-static-electron');
+const exec = require('child_process').exec;
+// const ffmpeg = require('fluent-ffmpeg');
+// ffmpeg.setFfmpegPath(ffmpegStatic.path);
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -23,7 +28,9 @@ function createWindow() {
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     // win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
-    if (!process.env.IS_TEST) { win.webContents.openDevTools(); }
+    if (!process.env.IS_TEST) {
+      // win.webContents.openDevTools();
+    }
   } else {
     createProtocol('app');
     // Load the index.html when not in development
@@ -60,11 +67,26 @@ app.on('ready', async () => {
     // Install Vue Devtools
     await installVueDevtools();
   }
-  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-    if (details.url.match(/playlist.m3u8/) && details.headers['X-Radiko-AuthToken']) {
+  (session as any).defaultSession.webRequest.onBeforeSendHeaders((details: any, callback: (opt: any) => void) => {
+    if (
+      details.url.match(/playlist.m3u8/) &&
+      details.headers['X-Radiko-AuthToken']
+    ) {
       // console.log(details);
-      console.log('url: ', details.url)
-      console.log('X-Radiko-AuthToken: ', details.headers['X-Radiko-AuthToken']);
+      console.log('url: ', details.url);
+      console.log(
+        'X-Radiko-AuthToken: ',
+        details.headers['X-Radiko-AuthToken'],
+      );
+      exec(
+        'cd $HOME &&' +
+        ffmpegStatic.path.replace('app.asar', 'app.asar.unpacked/node_modules/ffmpeg-static-electron') +
+          ' -headers "X-Radiko-AuthToken: ' +
+          details.headers['X-Radiko-AuthToken'] +
+          '" -i "' +
+          details.url +
+          '" -acodec copy "radiko.ts"',
+      );
     }
     callback({});
   });
