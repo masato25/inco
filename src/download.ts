@@ -2,17 +2,30 @@ import { app, dialog } from 'electron';
 import log from 'electron-log';
 // const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static-electron');
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
-// app.getPath('exe')
 // TODO windows対応
-const ffmpegPath = ffmpegStatic.path.replace(
-  'app.asar',
-  'app.asar.unpacked/node_modules/ffmpeg-static-electron',
-);
+const generateFfmpegPath = () => {
+  if (isDevelopment) {
+    return ffmpegStatic.path.replace(
+      'dist_electron/bin',
+      'dist_electron/mac/inco.app/Contents/Resources/app.asar.unpacked/node_modules/ffmpeg-static-electron/bin',
+    );
+  }
+  return ffmpegStatic.path.replace(
+    'app.asar',
+    'app.asar.unpacked/node_modules/ffmpeg-static-electron',
+  );
+};
+
+const ffmpegPath = generateFfmpegPath();
 // tempにダウンロード
 // app.getPath('temp')
 // downloadフォルダに移行
 // app.getPath('downloads')
+// log.info(app.getPath('exe'));
+// log.info(app.getPath('temp'));
+// log.info(app.getPath('downloads'));
 
 // ffmpeg.setFfmpegPath(ffmpegStatic.path);
 // console.log(details);

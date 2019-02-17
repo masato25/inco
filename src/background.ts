@@ -6,6 +6,7 @@ import {
   installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib';
 import { download } from './download';
+import log from 'electron-log';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -62,18 +63,20 @@ app.on('ready', async () => {
     // Install Vue Devtools
     await installVueDevtools();
   }
-  (session as any).defaultSession.webRequest.onBeforeSendHeaders((details: any, callback: (opt: any) => void) => {
-    if (
-      details.url.match(/playlist.m3u8/) &&
-      details.headers['X-Radiko-AuthToken']
-    ) {
-      download({
-        url: details.url,
-        headers: details.headers,
-      });
-    }
-    callback({});
-  });
+  (session as any).defaultSession.webRequest.onBeforeSendHeaders(
+    (details: any, callback: (opt: any) => void) => {
+      if (
+        details.url.match(/playlist.m3u8/) &&
+        details.headers['X-Radiko-AuthToken']
+      ) {
+        download({
+          url: details.url,
+          headers: details.headers,
+        });
+      }
+      callback({});
+    },
+  );
 
   createWindow();
 });
