@@ -3,6 +3,10 @@ module.exports = {
     electronBuilder: {
       builderOptions: {
         mac: {
+          // "asar": true,
+          // "asarUnpack": [
+          //   "node_modules/@ffmpeg-installer"
+          // ],
           icon: 'build/icon.png',
         },
         win: {

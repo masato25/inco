@@ -1,16 +1,11 @@
 'use strict';
 
 import { app, protocol, BrowserWindow, session } from 'electron';
-import { log } from 'electron-log';
 import {
   createProtocol,
   installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib';
-const ffmpegStatic = require('ffmpeg-static-electron');
-const exec = require('child_process').exec;
-// const ffmpeg = require('fluent-ffmpeg');
-// ffmpeg.setFfmpegPath(ffmpegStatic.path);
-
+import { download } from './download';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -72,21 +67,10 @@ app.on('ready', async () => {
       details.url.match(/playlist.m3u8/) &&
       details.headers['X-Radiko-AuthToken']
     ) {
-      // console.log(details);
-      console.log('url: ', details.url);
-      console.log(
-        'X-Radiko-AuthToken: ',
-        details.headers['X-Radiko-AuthToken'],
-      );
-      exec(
-        'cd $HOME &&' +
-        ffmpegStatic.path.replace('app.asar', 'app.asar.unpacked/node_modules/ffmpeg-static-electron') +
-          ' -headers "X-Radiko-AuthToken: ' +
-          details.headers['X-Radiko-AuthToken'] +
-          '" -i "' +
-          details.url +
-          '" -acodec copy "radiko.ts"',
-      );
+      download({
+        url: details.url,
+        headers: details.headers,
+      });
     }
     callback({});
   });
