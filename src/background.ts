@@ -72,6 +72,7 @@ app.on('ready', async () => {
         download({
           url: details.url,
           headers: details.headers,
+          title: win.getTitle(),
         });
       }
       callback({});

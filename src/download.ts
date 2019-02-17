@@ -30,12 +30,14 @@ const ffmpegPath = generateFfmpegPath();
 // ffmpeg.setFfmpegPath(ffmpegStatic.path);
 // console.log(details);
 
-const download = (opt: { url: string; headers: { [key: string]: string } }) => {
+const download = (opt: { url: string; headers: { [key: string]: string }, title: string }) => {
   const url = opt.url;
   const token = opt.headers['X-Radiko-AuthToken'];
+  const title = opt.title;
 
   log.info('url: ', url);
   log.info('X-Radiko-AuthToken: ', token);
+  log.info('title: ', title);
 
   const ans = dialog.showMessageBox({
     type: 'info',
