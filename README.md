@@ -1,29 +1,31 @@
 # inco
 
-## Project setup
-```
-npm install
-```
+![icon.png](https://raw.githubusercontent.com/soramugi/inco/master/build/icon.png "incoアイコン")
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+radikoタイムフリーのダウンロードアプリケーション
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## 概要
 
-### Run your tests
-```
-npm run test
-```
+パソコンやスマホでラジオが聴けるサービスのradiko。そのradikoの過去1週間以内に放送された番組が聴けるタイムフリー機能で聴取できる番組をダウンロードするパソコン向けアプリケーションが「inco」です。
 
-### Lints and fixes files
-```
-npm run lint
-```
+## incoダウンロード方法
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+githubのreleases機能を使用。
+
+このURLから
+https://github.com/soramugi/inco/releases
+
+- Macなら`dmg`ファイル
+- Windowsなら `exe`ファイル
+
+をダウンロードとインストールをしてください。
+
+## 使用方法
+
+「inco」のアプリケーションを起動するとradikoタイムフリーの画面が表示されます。
+「inco」上で表示されるradikoタイムフリーの聴取を始めるとダウンロードが始まります。
+
+[![Image from Gyazo](https://i.gyazo.com/044cac66fdf74d11ce82663b8a3da4d8.gif)](https://gyazo.com/044cac66fdf74d11ce82663b8a3da4d8)
+
+ダウンロードが完了すると`~/Download`ディレクトリにmp4ファイルがダウンロードされます。
+
