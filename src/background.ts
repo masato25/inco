@@ -17,7 +17,7 @@ let win: any;
 protocol.registerStandardSchemes(['app'], { secure: true });
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 600 });
+  win = new BrowserWindow({ width: 1152, height: 600 });
 
   win.loadURL('http://radiko.jp/#!/timeshift');
 

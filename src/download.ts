@@ -1,7 +1,9 @@
 import { app, dialog } from 'electron';
 import log from 'electron-log';
-// const ffmpeg = require('fluent-ffmpeg');
-const ffmpegStatic = require('ffmpeg-static-electron');
+import { spawn } from 'child_process';
+import * as path from 'path';
+// tslint:disable-next-line
+const ffmpegStatic = require("ffmpeg-static-electron");
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // TODO windows対応
@@ -18,20 +20,13 @@ const generateFfmpegPath = () => {
   );
 };
 
-const ffmpegPath = generateFfmpegPath();
-// tempにダウンロード
-// app.getPath('temp')
-// downloadフォルダに移行
-// app.getPath('downloads')
-// log.info(app.getPath('exe'));
-// log.info(app.getPath('temp'));
-// log.info(app.getPath('downloads'));
-
-// ffmpeg.setFfmpegPath(ffmpegStatic.path);
-// console.log(details);
-
-const download = (opt: { url: string; headers: { [key: string]: string }, title: string }) => {
-  const url = opt.url;
+const download = (opt: {
+  url: string;
+  headers: { [key: string]: string };
+  title: string;
+}) => {
+  const ffmpegPath = generateFfmpegPath();
+  const url: string = opt.url;
   const token = opt.headers['X-Radiko-AuthToken'];
   const title = opt.title;
 
@@ -44,26 +39,51 @@ const download = (opt: { url: string; headers: { [key: string]: string }, title:
     buttons: ['Yes', 'No'],
     title: 'ダウンロード選択',
     message: 'ダウンロードを開始しますか?',
-    detail: url,
+    detail: title,
   });
 
-  if (ans === 0) {
-    log.info('yes');
-    log.info(ffmpegPath);
+  if (ans !== 0) {
+    return;
   }
+  log.info('yes');
+  log.info(ffmpegPath);
 
-  // exec(
-  //   'cd $HOME &&' +
-  //     ffmpegStatic.path.replace(
-  //       'app.asar',
-  //       'app.asar.unpacked/node_modules/ffmpeg-static-electron',
-  //     ) +
-  //     ' -headers "X-Radiko-AuthToken: ' +
-  //     token +
-  //     '" -i "' +
-  //     url +
-  //     '" -acodec copy "radiko.ts"',
-  // );
+  const options = [
+    '-headers',
+    'X-Radiko-AuthToken: ' + token + '',
+    '-i',
+    url,
+    '-bsf:a',
+    'aac_adtstoasc',
+    '-y',
+    '-acodec',
+    'copy',
+    path
+      .join(app.getPath('downloads'), title.replace(/\/|:/g, '-') + '.mp4')
+      .replace(/\|/g, ' ')
+      .replace(/\s+/g, '_'),
+  ];
+  const ffmpeg = spawn(ffmpegPath, options);
+
+  ffmpeg.stdout.on('data', (data) => {
+    log.info(`stdout: ${data}`);
+  });
+
+  ffmpeg.stderr.on('data', (data) => {
+    log.info(`stderr: ${data}`);
+  });
+
+  ffmpeg.on('close', (code) => {
+    log.info(`child process exited with code ${code}`);
+    dialog.showMessageBox({
+      type: 'info',
+      buttons: [],
+      message: 'ダウンロードが完了しました title: ' + title,
+    });
+  });
+  ffmpeg.on('error', (err) => {
+    dialog.showErrorBox('ダウンロード中にエラーが発生しました', err.message);
+  });
 };
 
 export { download };
