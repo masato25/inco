@@ -1,20 +1,25 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    title
+    <el-progress :text-inside="true" :stroke-width="18" :percentage="100" status="success"></el-progress>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
 
-@Component({
-  components: {
-    HelloWorld,
-  },
-})
+@Component
 export default class App extends Vue {}
+  // public mounted() {
+  //   // setInterval(() => {
+  //   //   this.$electron.ipcRenderer.send('ping')
+  //   // }, 1000)
+
+  //   // this.$electron.ipcRenderer.on('pong', (event, data) => {
+  //   //   // this.myDataVar = data
+  //   //   console.log(data)
+  //   // })
+  // }
 </script>
 
 <style>
@@ -24,6 +29,5 @@ export default class App extends Vue {}
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

@@ -1,10 +1,7 @@
 'use strict';
 
 import { app, protocol, BrowserWindow, session } from 'electron';
-import {
-  createProtocol,
-  installVueDevtools,
-} from 'vue-cli-plugin-electron-builder/lib';
+import { installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
 import { download } from './download';
 import log from 'electron-log';
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -20,18 +17,6 @@ function createWindow() {
   win = new BrowserWindow({ width: 1152, height: 600 });
 
   win.loadURL('http://radiko.jp/#!/timeshift');
-
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    // win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
-    if (!process.env.IS_TEST) {
-      // win.webContents.openDevTools();
-    }
-  } else {
-    createProtocol('app');
-    // Load the index.html when not in development
-    // win.loadURL('app://./index.html');
-  }
 
   win.on('closed', () => {
     win = null;
@@ -70,6 +55,7 @@ app.on('ready', async () => {
         details.headers['X-Radiko-AuthToken']
       ) {
         download({
+          win,
           url: details.url,
           headers: details.headers,
           title: win.getTitle(),

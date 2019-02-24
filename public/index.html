@@ -6,8 +6,20 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>inco</title>
+    <script>
+      try {
+        let progress;
+        if (require) {
+          require('electron').ipcRenderer.on('progress', (event, message) => {
+            progress = message;
+            console.log('progress: ', progress);
+          });
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
+    <div id="test"></div>
     <noscript>
       <strong>We're sorry but inco doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>

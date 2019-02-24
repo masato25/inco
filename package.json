@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "electron-log": "^3.0.1",
+    "element-ui": "^2.5.4",
     "ffmpeg-static-electron": "^2.0.1",
     "vue": "^2.5.22",
     "vue-class-component": "^6.0.0",

@@ -1,7 +1,8 @@
-import { app, dialog, Notification } from 'electron';
+import { app, dialog, BrowserWindow, Notification } from 'electron';
 import log from 'electron-log';
 import { spawn } from 'child_process';
 import * as path from 'path';
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 // tslint:disable-next-line
 const ffmpegStatic = require("ffmpeg-static-electron");
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -33,7 +34,7 @@ const time2sec = (time: string): number => {
 
 let totalSec = 0;
 let timeSec = 0;
-const putProgress = (str: string) => {
+const getProgress = (str: string) => {
   const duration = str.match(/Duration:\s(\d{2}:\d{2}:\d{2}.\d{2})/);
   if (duration && Array.isArray(duration) && duration[1]) {
     totalSec = time2sec(duration[1]);
@@ -43,16 +44,19 @@ const putProgress = (str: string) => {
     timeSec = time2sec(time[1]);
   }
   if (totalSec > 0 && timeSec > 0) {
-    const progress = Math.floor((timeSec / totalSec) * 100);
-    log.info(`progress: ${progress}`);
+    const progress = timeSec / totalSec;
+    return progress;
   }
+  return 0;
 };
 
 const download = (opt: {
+  win: BrowserWindow;
   url: string;
   headers: { [key: string]: string };
   title: string;
 }) => {
+  const win = opt.win;
   const ffmpegPath = generateFfmpegPath();
   const url: string = opt.url;
   const token = opt.headers['X-Radiko-AuthToken'];
@@ -91,8 +95,32 @@ const download = (opt: {
     log.info(`stdout: ${data}`);
   });
 
+  const child: BrowserWindow = new BrowserWindow({
+    width: 300,
+    height: 100,
+    parent: win,
+    show: false,
+  });
+
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    child.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
+    if (!process.env.IS_TEST) {
+      // child.webContents.openDevTools();
+    }
+  } else {
+    createProtocol('app');
+    child.loadURL('app://./index.html');
+  }
+
+  child.show();
+  child.webContents.send('title', title);
+  // child.on('closed', () => {
+  //   child = null;
+  // });
   ffmpeg.stderr.on('data', (data: any) => {
-    putProgress(data.toString());
+    const progress = getProgress(data.toString());
+    child.setProgressBar(progress);
+    child.webContents.send('progress', progress);
     log.info(`stderr: ${data}`);
   });
 
@@ -103,6 +131,8 @@ const download = (opt: {
       body: title,
     });
     notifi.show();
+    child.setProgressBar(-1);
+    child.close();
   });
   ffmpeg.on('error', (err) => {
     dialog.showErrorBox('ダウンロード中にエラーが発生しました', err.message);
