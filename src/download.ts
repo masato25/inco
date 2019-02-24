@@ -22,6 +22,32 @@ const generateFfmpegPath = () => {
   );
 };
 
+const time2sec = (time: string): number => {
+  const parse = time.split(':');
+  return (
+    parseInt(parse[0], 10) * 60 * 60 +
+    parseInt(parse[1], 10) * 60 +
+    parseInt(parse[2], 10)
+  );
+};
+
+let totalSec = 0;
+let timeSec = 0;
+const putProgress = (str: string) => {
+  const duration = str.match(/Duration:\s(\d{2}:\d{2}:\d{2}.\d{2})/);
+  if (duration && Array.isArray(duration) && duration[1]) {
+    totalSec = time2sec(duration[1]);
+  }
+  const time = str.match(/time=(\d{2}:\d{2}:\d{2}.\d{2})/);
+  if (time && Array.isArray(time) && time[1]) {
+    timeSec = time2sec(time[1]);
+  }
+  if (totalSec > 0 && timeSec > 0) {
+    const progress = Math.floor((timeSec / totalSec) * 100);
+    log.info(`progress: ${progress}`);
+  }
+};
+
 const download = (opt: {
   url: string;
   headers: { [key: string]: string };
@@ -65,7 +91,8 @@ const download = (opt: {
     log.info(`stdout: ${data}`);
   });
 
-  ffmpeg.stderr.on('data', (data) => {
+  ffmpeg.stderr.on('data', (data: any) => {
+    putProgress(data.toString());
     log.info(`stderr: ${data}`);
   });
 
