@@ -127,7 +127,7 @@ const download = (opt: {
       child.webContents.send('progress', progress);
       log.info(`stderr: ${data}`);
     } else {
-      // TODO ffmpegの終了
+      ffmpeg.kill();
     }
   });
 
