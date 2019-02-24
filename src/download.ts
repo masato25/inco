@@ -6,13 +6,15 @@ import * as path from 'path';
 const ffmpegStatic = require("ffmpeg-static-electron");
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-// TODO windows対応
 const generateFfmpegPath = () => {
   if (isDevelopment) {
-    return ffmpegStatic.path.replace(
-      'dist_electron/bin',
-      'dist_electron/mac/inco.app/Contents/Resources/app.asar.unpacked/node_modules/ffmpeg-static-electron/bin',
+    const repPath = path.join(
+      'dist_electron',
+      '..',
+      'node_modules',
+      'ffmpeg-static-electron',
     );
+    return ffmpegStatic.path.replace('dist_electron', repPath);
   }
   return ffmpegStatic.path.replace(
     'app.asar',
