@@ -7,14 +7,9 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>inco</title>
     <script>
+      var electron;
       try {
-        let progress;
-        if (require) {
-          require('electron').ipcRenderer.on('progress', (event, message) => {
-            progress = message;
-            console.log('progress: ', progress);
-          });
-        }
+        electron = require('electron');
       } catch (e) {}
     </script>
   </head>

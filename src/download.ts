@@ -32,24 +32,6 @@ const time2sec = (time: string): number => {
   );
 };
 
-let totalSec = 0;
-let timeSec = 0;
-const getProgress = (str: string) => {
-  const duration = str.match(/Duration:\s(\d{2}:\d{2}:\d{2}.\d{2})/);
-  if (duration && Array.isArray(duration) && duration[1]) {
-    totalSec = time2sec(duration[1]);
-  }
-  const time = str.match(/time=(\d{2}:\d{2}:\d{2}.\d{2})/);
-  if (time && Array.isArray(time) && time[1]) {
-    timeSec = time2sec(time[1]);
-  }
-  if (totalSec > 0 && timeSec > 0) {
-    const progress = timeSec / totalSec;
-    return progress;
-  }
-  return 0;
-};
-
 const download = (opt: {
   win: BrowserWindow;
   url: string;
@@ -91,13 +73,27 @@ const download = (opt: {
   ];
   const ffmpeg = spawn(ffmpegPath, options);
 
-  ffmpeg.stdout.on('data', (data) => {
-    log.info(`stdout: ${data}`);
-  });
+  let totalSec = 0;
+  let timeSec = 0;
+  const getProgress = (str: string) => {
+    const duration = str.match(/Duration:\s(\d{2}:\d{2}:\d{2}.\d{2})/);
+    if (duration && Array.isArray(duration) && duration[1]) {
+      totalSec = time2sec(duration[1]);
+    }
+    const time = str.match(/time=(\d{2}:\d{2}:\d{2}.\d{2})/);
+    if (time && Array.isArray(time) && time[1]) {
+      timeSec = time2sec(time[1]);
+    }
+    if (totalSec > 0 && timeSec > 0) {
+      const progress = timeSec / totalSec;
+      return progress;
+    }
+    return 0;
+  };
 
-  const child: BrowserWindow = new BrowserWindow({
-    width: 300,
-    height: 100,
+  let child: BrowserWindow | null = new BrowserWindow({
+    width: 500,
+    height: 150,
     parent: win,
     show: false,
   });
@@ -113,15 +109,26 @@ const download = (opt: {
   }
 
   child.show();
-  child.webContents.send('title', title);
-  // child.on('closed', () => {
-  //   child = null;
-  // });
+  child.on('closed', () => {
+    // ffmpeg.stdin.pause();
+    ffmpeg.kill();
+    child = null;
+  });
+
+  ffmpeg.stdout.on('data', (data) => {
+    log.info(`stdout: ${data}`);
+  });
+
   ffmpeg.stderr.on('data', (data: any) => {
-    const progress = getProgress(data.toString());
-    child.setProgressBar(progress);
-    child.webContents.send('progress', progress);
-    log.info(`stderr: ${data}`);
+    if (child) {
+      child.webContents.send('title', title);
+      const progress = getProgress(data.toString());
+      // child.setProgressBar(progress);
+      child.webContents.send('progress', progress);
+      log.info(`stderr: ${data}`);
+    } else {
+      // TODO ffmpegの終了
+    }
   });
 
   ffmpeg.on('close', (code) => {
@@ -131,8 +138,15 @@ const download = (opt: {
       body: title,
     });
     notifi.show();
-    child.setProgressBar(-1);
-    child.close();
+    if (child) {
+      child.setProgressBar(-1);
+      child.webContents.send('progress', 1);
+      setTimeout(() => {
+        if (child) {
+          child.close();
+        }
+      }, 3000);
+    }
   });
   ffmpeg.on('error', (err) => {
     dialog.showErrorBox('ダウンロード中にエラーが発生しました', err.message);
