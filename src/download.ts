@@ -1,4 +1,4 @@
-import { app, dialog } from 'electron';
+import { app, dialog, Notification } from 'electron';
 import log from 'electron-log';
 import { spawn } from 'child_process';
 import * as path from 'path';
@@ -36,18 +36,12 @@ const download = (opt: {
   log.info('X-Radiko-AuthToken: ', token);
   log.info('title: ', title);
 
-  const ans = dialog.showMessageBox({
-    type: 'info',
-    buttons: ['Yes', 'No'],
-    title: 'ダウンロード選択',
-    message: 'ダウンロードを開始しますか?',
-    detail: title,
+  const notification = new Notification({
+    title: 'ダウンロードが開始されました',
+    body: title,
   });
+  notification.show();
 
-  if (ans !== 0) {
-    return;
-  }
-  log.info('yes');
   log.info(ffmpegPath);
 
   const options = [
@@ -77,11 +71,11 @@ const download = (opt: {
 
   ffmpeg.on('close', (code) => {
     log.info(`child process exited with code ${code}`);
-    dialog.showMessageBox({
-      type: 'info',
-      buttons: [],
-      message: 'ダウンロードが完了しました title: ' + title,
+    const notifi = new Notification({
+      title: 'ダウンロードが完了しました',
+      body: title,
     });
+    notifi.show();
   });
   ffmpeg.on('error', (err) => {
     dialog.showErrorBox('ダウンロード中にエラーが発生しました', err.message);
