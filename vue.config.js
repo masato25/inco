@@ -4,6 +4,9 @@ module.exports = {
       disableMainProcessTypescript: false,
       mainProcessTypeChecking: false,
       builderOptions: {
+        publish: {
+          provider: 'github'
+        },
         mac: {
           // "asar": true,
           // "asarUnpack": [
