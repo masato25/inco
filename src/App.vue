@@ -7,8 +7,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-
-declare var electron: any;
+import electron from 'electron';
 
 @Component
 export default class App extends Vue {
@@ -17,17 +16,15 @@ export default class App extends Vue {
   public status: string = '';
 
   public mounted() {
-    if (electron) {
-      electron.ipcRenderer.on('progress', (event: any, message: number) => {
-        this.progress = Math.floor(message * 100);
-        if (message === 1) {
-          this.status = 'success';
-        }
-      });
-      electron.ipcRenderer.on('title', (event: any, message: string) => {
-        this.title = 'Downloading: ' + message;
-      });
-    }
+    electron.ipcRenderer.on('progress', (event: any, message: number) => {
+      this.progress = Math.floor(message * 100);
+      if (message === 1) {
+        this.status = 'success';
+      }
+    });
+    electron.ipcRenderer.on('title', (event: any, message: string) => {
+      this.title = 'Downloading: ' + message;
+    });
   }
 }
 </script>
