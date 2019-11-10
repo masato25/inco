@@ -3,6 +3,10 @@ import log from 'electron-log';
 import { spawn } from 'child_process';
 import * as path from 'path';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
+import Config from 'electron-config';
+
+const config = new Config();
+
 // tslint:disable-next-line
 const ffmpegStatic = require("ffmpeg-static-electron");
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -56,6 +60,8 @@ const download = (opt: {
 
   log.info(ffmpegPath);
 
+  const downloadPath = config.get('downloads') || app.getPath('downloads');
+
   const options = [
     '-headers',
     'X-Radiko-AuthToken: ' + token + '',
@@ -67,7 +73,7 @@ const download = (opt: {
     '-acodec',
     'copy',
     path
-      .join(app.getPath('downloads'), title.replace(/\/|:/g, '-') + '.mp4')
+      .join(downloadPath, title.replace(/\/|:/g, '-') + '.mp4')
       .replace(/\|/g, ' ')
       .replace(/\s+/g, '_'),
   ];

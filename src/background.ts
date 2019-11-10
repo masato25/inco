@@ -1,6 +1,6 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, session, Menu } from 'electron';
+import { app, protocol, BrowserWindow, session, dialog, Menu } from 'electron';
 import { installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
 import { download } from './download';
 import Config from 'electron-config';
@@ -20,6 +20,7 @@ const config = new Config({
       width: 1152,
       height: 600,
     },
+    downloads: app.getPath('downloads'),
   },
 });
 
@@ -44,6 +45,24 @@ function createWindow() {
     {
       label: 'inco',
       submenu: [
+        {
+          label: 'ダウンロード先の変更',
+          click: () => {
+            dialog.showOpenDialog(
+              {
+                defaultPath: config.get('downloads'),
+                properties: ['openDirectory'],
+              },
+              (dirs: any[]) => {
+                if (dirs && Array.isArray(dirs) && dirs.length) {
+                  const dir = dirs.shift();
+                  config.set('downloads', dir);
+                }
+              },
+            );
+          },
+        },
+        { type: 'separator' },
         {
           label: 'Version: ' + app.getVersion(),
         },
