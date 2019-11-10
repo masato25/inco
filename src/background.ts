@@ -4,6 +4,13 @@ import { app, protocol, BrowserWindow, session } from 'electron';
 import { installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
 import { download } from './download';
 import log from 'electron-log';
+
+// tslint:disable-next-line:no-var-requires
+if (require('electron-squirrel-startup')) {
+  app.quit();
+}
+import './auto-update';
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
