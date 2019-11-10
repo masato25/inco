@@ -12,10 +12,10 @@ module.exports = {
           // "asarUnpack": [
           //   "node_modules/@ffmpeg-installer"
           // ],
-          icon: "build/icon.png"
+          icon: "src/assets/icon.png"
         },
         win: {
-          icon: "build/icon.png"
+          icon: "src/assets/icon.png"
         }
       },
       chainWebpackMainProcess: config => {

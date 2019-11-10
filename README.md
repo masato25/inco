@@ -1,6 +1,6 @@
 # inco
 
-![icon.png](https://raw.githubusercontent.com/soramugi/inco/master/build/icon.png "incoアイコン")
+![icon.png](https://raw.githubusercontent.com/soramugi/inco/master/src/assets/icon.png "incoアイコン")
 
 radikoタイムフリーのダウンロードアプリケーション
 

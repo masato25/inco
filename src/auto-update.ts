@@ -1,6 +1,7 @@
 import { app, dialog } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
+
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 autoUpdater.logger = log;

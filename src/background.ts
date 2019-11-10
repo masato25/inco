@@ -1,6 +1,6 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, session } from 'electron';
+import { app, protocol, BrowserWindow, session, Menu } from 'electron';
 import { installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
 import { download } from './download';
 import log from 'electron-log';
@@ -28,6 +28,18 @@ function createWindow() {
   win.on('closed', () => {
     win = null;
   });
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'inco',
+      submenu: [
+        {
+          label: 'Version: ' + app.getVersion(),
+        },
+      ],
+    },
+  ]);
+  Menu.setApplicationMenu(menu);
 }
 
 // Quit when all windows are closed.
