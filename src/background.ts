@@ -3,6 +3,7 @@
 import { app, protocol, BrowserWindow, session, Menu } from 'electron';
 import { installVueDevtools } from 'vue-cli-plugin-electron-builder/lib';
 import { download } from './download';
+import Config from 'electron-config';
 import log from 'electron-log';
 
 // tslint:disable-next-line:no-var-requires
@@ -13,6 +14,15 @@ import './auto-update';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
+const config = new Config({
+  defaults: {
+    bounds: {
+      width: 1152,
+      height: 600,
+    },
+  },
+});
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win: any;
@@ -20,8 +30,9 @@ let win: any;
 // Standard scheme must be registered before the app is ready
 protocol.registerStandardSchemes(['app'], { secure: true });
 function createWindow() {
-  // Create the browser window.
-  win = new BrowserWindow({ width: 1152, height: 600 });
+  const { width, height, x, y } = config.get('bounds');
+
+  win = new BrowserWindow({ width, height, x, y });
 
   win.loadURL('http://radiko.jp/#!/timeshift');
 
@@ -40,6 +51,13 @@ function createWindow() {
     },
   ]);
   Menu.setApplicationMenu(menu);
+
+  win.on('resize', () => {
+    config.set('bounds', win.getBounds());
+  });
+  win.on('move', () => {
+    config.set('bounds', win.getBounds());
+  });
 }
 
 // Quit when all windows are closed.
