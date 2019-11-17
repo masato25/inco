@@ -37,6 +37,8 @@ function createWindow() {
 
   win.loadURL('http://radiko.jp/#!/timeshift');
 
+  // win.openDevTools();
+
   win.on('closed', () => {
     win = null;
   });
