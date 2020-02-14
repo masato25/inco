@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <el-progress :text-inside="true" :stroke-width="18" :percentage=progress :status=status></el-progress>
+    <p>Downloading ...</p>
     <p style="overflow: scroll;">{{title}}</p>
+    <p>size {{progress}} </p>
   </div>
 </template>
 
@@ -12,18 +13,18 @@ import electron from 'electron';
 @Component
 export default class App extends Vue {
   public title: string = 'Loading...';
-  public progress: number = 0;
+  public progress: number | string = 0;
   public status: string = '';
 
   public mounted() {
-    electron.ipcRenderer.on('progress', (event: any, message: number) => {
-      this.progress = Math.floor(message * 100);
+    electron.ipcRenderer.on('progress', (event: any, message: string | number) => {
+      this.progress = message;
       if (message === 1) {
-        this.status = 'success';
+        this.progress = 'success';
       }
     });
     electron.ipcRenderer.on('title', (event: any, message: string) => {
-      this.title = 'Downloading: ' + message;
+      this.title = message;
     });
   }
 }

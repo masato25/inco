@@ -63,43 +63,36 @@ const download = (opt: {
   const downloadPath = config.get('downloads') || app.getPath('downloads');
 
   const options = [
+    '-fflags',
+    '+discardcorrupt',
     '-headers',
     'X-Radiko-AuthToken: ' + token + '',
     '-i',
     url,
+    '-acodec',
+    'copy',
+    '-vn',
     '-bsf:a',
     'aac_adtstoasc',
     '-y',
-    '-acodec',
-    'copy',
     path
-      .join(downloadPath, title.replace(/\/|:/g, '-') + '.mp4')
+      .join(downloadPath, title.replace(/\/|:/g, '-') + '.m4a')
       .replace(/\|/g, ' ')
       .replace(/\s+/g, '_'),
   ];
   const ffmpeg = spawn(ffmpegPath, options);
 
-  let totalSec = 0;
-  let timeSec = 0;
-  const getProgress = (str: string) => {
-    const duration = str.match(/Duration:\s(\d{2}:\d{2}:\d{2}.\d{2})/);
-    if (duration && Array.isArray(duration) && duration[1]) {
-      totalSec = time2sec(duration[1]);
-    }
-    const time = str.match(/time=(\d{2}:\d{2}:\d{2}.\d{2})/);
+  const getProgress = (str: string): string => {
+    const time = str.match(/size=([\w|\s]+) time/);
     if (time && Array.isArray(time) && time[1]) {
-      timeSec = time2sec(time[1]);
+      return time[1];
     }
-    if (totalSec > 0 && timeSec > 0) {
-      const progress = timeSec / totalSec;
-      return progress;
-    }
-    return 0;
+    return '';
   };
 
   let child: BrowserWindow | null = new BrowserWindow({
     width: 500,
-    height: 150,
+    height: 200,
     parent: win,
     show: false,
   });
