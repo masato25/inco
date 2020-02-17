@@ -12,19 +12,21 @@ const ffmpegStatic = require("ffmpeg-static-electron");
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 const generateFfmpegPath = () => {
-  if (isDevelopment) {
-    const repPath = path.join(
-      'dist_electron',
-      '..',
-      'node_modules',
-      'ffmpeg-static-electron',
-    );
-    return ffmpegStatic.path.replace('dist_electron', repPath);
-  }
-  return ffmpegStatic.path.replace(
-    'app.asar',
-    'app.asar.unpacked/node_modules/ffmpeg-static-electron',
-  );
+  // use system installed ffmpeg
+  return "/usr/bin/ffmpeg";
+  // if (isDevelopment) {
+  //   const repPath = path.join(
+  //     'dist_electron',
+  //     '..',
+  //     'node_modules',
+  //     'ffmpeg-static-electron',
+  //   );
+  //   return ffmpegStatic.path.replace('dist_electron', repPath);
+  // }
+  // return ffmpegStatic.path.replace(
+  //   'app.asar',
+  //   'app.asar.unpacked/node_modules/ffmpeg-static-electron',
+  // );
 };
 
 const time2sec = (time: string): number => {
