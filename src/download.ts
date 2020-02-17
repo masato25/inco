@@ -66,9 +66,9 @@ const download = (opt: {
 
   const options = [
     '-headers',
-    'X-Radiko-AuthToken: ' + token + '',
+    `X-Radiko-AuthToken: ${token}`,
     '-i',
-    url,
+    `${url}`,
     '-bsf:a',
     'aac_adtstoasc',
     '-y',
@@ -79,6 +79,7 @@ const download = (opt: {
       .replace(/\|/g, ' ')
       .replace(/\s+/g, '_'),
   ];
+  log.info(ffmpegPath, options);
   const ffmpeg = spawn(ffmpegPath, options);
 
   let totalSec = 0;
@@ -131,7 +132,7 @@ const download = (opt: {
     if (child) {
       child.webContents.send('title', title);
       const progress = getProgress(data.toString());
-      // child.setProgressBar(progress);
+      child.setProgressBar(progress);
       child.webContents.send('progress', progress);
       log.info(`stderr: ${data}`);
     } else {
@@ -142,7 +143,7 @@ const download = (opt: {
   ffmpeg.on('close', (code) => {
     log.info(`child process exited with code ${code}`);
     const notifi = new Notification({
-      title: 'ダウンロードが完了しました',
+      title: `ダウンロードが完了しました`,
       body: title,
     });
     notifi.show();
